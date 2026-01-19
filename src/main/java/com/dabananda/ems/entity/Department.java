@@ -6,23 +6,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "employees")
-public class Employee {
+@Entity
+@Table(name = "departments")
+public class Department {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
+    @Column(name = "department_name", nullable = false)
+    private String departmentName;
     
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
-    
-    @Column(name = "password", nullable = false, unique = true)
-    private String email;
+    @Column(name = "department_description")
+    private String departmentDescription;
 }
