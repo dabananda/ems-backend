@@ -1,9 +1,11 @@
 package com.dabananda.ems.service.impl;
 
 import com.dabananda.ems.dto.EmployeeDto;
+import com.dabananda.ems.entity.Department;
 import com.dabananda.ems.entity.Employee;
 import com.dabananda.ems.exception.ResourceNotFoundException;
 import com.dabananda.ems.mapper.EmployeeMapper;
+import com.dabananda.ems.repository.DepartmentRepository;
 import com.dabananda.ems.repository.EmployeeRepository;
 import com.dabananda.ems.service.EmployeeService;
 import lombok.AllArgsConstructor;
@@ -16,12 +18,19 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeRepository employeeRepository;
+    private DepartmentRepository departmentRepository;
     
     @Override
     public EmployeeDto createEmployee(EmployeeDto employeeDto) {
         Employee employee = EmployeeMapper.mapToEmployee(employeeDto);
-        employeeRepository.save(employee);
-        return EmployeeMapper.mapToEmployeeDto(employee);
+        
+        if (employeeDto.getDepartmentId() != null) {
+            Department department = departmentRepository.findById(employeeDto.getDepartmentId()).orElseThrow(() -> new ResourceNotFoundException("Department not found: " + employeeDto.getDepartmentId()));
+            employee.setDepartment(department);
+        }
+        
+        Employee savedEmployee = employeeRepository.save(employee);
+        return EmployeeMapper.mapToEmployeeDto(savedEmployee);
     }
 
     @Override
@@ -43,6 +52,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setFirstName(employeeDto.getFirstName());
         employee.setLastName(employeeDto.getLastName());
         employee.setEmail(employeeDto.getEmail());
+
+        if (employeeDto.getDepartmentId() != null) {
+            Department department = departmentRepository.findById(employeeDto.getDepartmentId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Department not found: " + employeeDto.getDepartmentId()));
+            employee.setDepartment(department);
+        }
+        
         Employee updatedEmployee = employeeRepository.save(employee);
         return EmployeeMapper.mapToEmployeeDto(updatedEmployee);
     }
